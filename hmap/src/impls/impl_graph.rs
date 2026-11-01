@@ -6,7 +6,7 @@ use crate::graph::HyperMap;
 use core::borrow::Borrow;
 use core::hash::{BuildHasher, Hash};
 use rshyper_core::edge::{HashEdge, HyperEdge};
-use rshyper_core::idx::{EdgeId, HashIndex, VertexId};
+use rshyper_core::idx::{EdgeId, HashIndex, IndexError, VertexId};
 use rshyper_core::{AddStep, Error, GraphProps, GraphType, Node, Result, VertexSet, Weight};
 
 /// this implementation of the [`HyperMap`] works to provide fundamental manipulation methods
@@ -30,24 +30,27 @@ where
     }
     /// add a new hyperedge with the given vertices and weight, returning the corresponding
     /// edge index.
+    ///
+    /// Repeated vertices collapse into one incidence (set semantics). The call fails with
+    /// [`Error::NodeNotFound`] if any vertex is missing and [`Error::EmptyHyperedge`] if the
+    /// domain is empty; on error the graph, including its history, is unchanged.
     pub fn add_edge<I>(&mut self, vertices: I, weight: Weight<E>) -> Result<EdgeId<Ix>>
     where
         I: IntoIterator<Item = VertexId<Ix>>,
         Ix: AddStep<Output = Ix> + Clone,
         S: Default,
     {
-        // collect the vertices into a HashSet to ensure uniqueness
-        let verts = vertices
-            .into_iter()
-            .map(|v| {
-                // ensure the vertex ID is valid
-                if !self.contains_node(&v) {
-                    return Err(Error::NodeNotFound);
-                }
-                Ok(v)
-            })
-            .filter_map(Result::ok)
-            .collect::<VertexSet<Ix, S>>();
+        let mut verts = VertexSet::<Ix, S>::default();
+        for v in vertices {
+            if !self.contains_node(&v) {
+                return Err(Error::NodeNotFound);
+            }
+            verts.insert(v);
+        }
+        // validate before allocating an id so a failure leaves the history untouched
+        if verts.is_empty() {
+            return Err(Error::EmptyHyperedge);
+        }
         // fetch the next edge index
         let id = self.next_edge_id();
         // create a new surface
@@ -288,6 +291,13 @@ where
         F: FnOnce(&E, &E) -> E,
         S: Default,
     {
+        // validate both operands before removing either so a failure loses nothing
+        if e1 == e2 {
+            return Err(IndexError::DuplicateIndex.into());
+        }
+        if !self.contains_edge(e1) || !self.contains_edge(e2) {
+            return Err(Error::EdgeNotFound);
+        }
         // try and remove the two edges from the hypergraph
         let s1 = self.remove_edge(e1)?;
         let s2 = self.remove_edge(e2)?;
@@ -370,7 +380,8 @@ where
         feature = "tracing",
         tracing::instrument(skip_all, level = "trace", target = "hyper_map")
     )]
-    /// retain nodes in the hypergraph based on a predicate;
+    /// retain nodes in the hypergraph based on a predicate; the node history is pruned to
+    /// match.
     ///
     /// ## Saftey
     ///
@@ -382,19 +393,24 @@ where
     where
         F: FnMut(&VertexId<Ix>, &mut Node<N, Ix>) -> bool,
     {
-        self.nodes_mut().retain(f);
+        let Self { nodes, history, .. } = self;
+        nodes.retain(f);
+        history.retain_nodes(|id| nodes.contains_key(id));
         self
     }
     #[cfg_attr(
         feature = "tracing",
         tracing::instrument(skip_all, level = "trace", target = "hyper_map")
     )]
-    /// retain surfaces in the hypergraph based on a predicate;
+    /// retain surfaces in the hypergraph based on a predicate; the edge history is pruned to
+    /// match.
     pub fn retain_edges<F>(&mut self, f: F) -> &mut Self
     where
         F: FnMut(&EdgeId<Ix>, &mut HashEdge<E, K, Ix, S>) -> bool,
     {
-        self.edges_mut().retain(f);
+        let Self { edges, history, .. } = self;
+        edges.retain(f);
+        history.retain_edges(|id| edges.contains_key(id));
         self
     }
     #[inline]

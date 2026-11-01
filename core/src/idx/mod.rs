@@ -30,7 +30,7 @@ mod impls {
     mod impl_index;
     mod impl_index_ext;
     mod impl_index_ops;
-    pub(self) mod impl_index_rand;
+    mod impl_index_rand;
     mod impl_index_repr;
 }
 
