@@ -40,8 +40,6 @@ rshyper-core = { default-features = false, path = "core", version = "0.1.10" }
 rshyper-hmap = { default-features = false, path = "hmap", version = "0.1.10" }
 # custom
 contained = { default-features = false, features = ["macros"], version = "0.2.3" }
-rspace-traits = { default-features = false, features = ["macros"], version = "0.0.7" }
-variants = { default-features = false, features = ["derive"], version = "0.0.1" }
 # benchmarking
 criterion = { version = "0.8" }
 # concurrency & parallelism

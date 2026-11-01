@@ -47,7 +47,7 @@ mod utils {
 
     mod base;
     #[cfg(all(feature = "alloc", feature = "rand"))]
-    pub(self) mod rand;
+    mod rand;
 }
 
 pub(crate) mod prelude {
