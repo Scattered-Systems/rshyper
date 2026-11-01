@@ -28,10 +28,10 @@ pub mod tracker;
 #[doc(hidden)]
 mod impls {
     mod impl_index;
-    mod impl_ops;
-    #[cfg(feature = "rand")]
-    pub(self) mod impl_rand;
-    mod impl_repr;
+    mod impl_index_ext;
+    mod impl_index_ops;
+    mod impl_index_rand;
+    mod impl_index_repr;
 }
 
 pub mod iter {
@@ -59,19 +59,19 @@ mod traits {
 
     /// this module defines various conversion routines for converting types into valid indices
     mod convert;
-    /// this module provides the [`RawIndex`] trait
-    mod index;
     /// this module provides the [`Indexed`] trait for defining various representations of a
     /// type that has knowledge of its index.
-    mod indexed;
+    mod graph_index;
+    /// this module provides the [`RawIndex`] trait
+    mod raw_index;
 
     pub(crate) mod prelude {
         #[doc(inline)]
         pub use super::convert::*;
         #[doc(inline)]
-        pub use super::index::*;
+        pub use super::graph_index::*;
         #[doc(inline)]
-        pub use super::indexed::*;
+        pub use super::raw_index::*;
     }
 }
 
@@ -98,4 +98,77 @@ pub(crate) mod prelude {
     pub use super::index::IndexBase;
     pub use super::traits::*;
     pub use super::types::*;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_index() -> crate::Result<()> {
+        let mut idx = IndexBase::<usize, VertexIndex>::new(1);
+        assert_eq!(idx.get(), &1);
+        idx.set(2);
+        assert_eq!(idx.get(), &2);
+        Ok(())
+    }
+
+    #[test]
+    fn test_edge_id() -> crate::Result<()> {
+        let mut edge_id = EdgeId::<usize>::default();
+        let e0 = edge_id.step()?;
+        let e1 = edge_id.step()?;
+        let e2 = edge_id.step()?;
+        assert_eq!(e0.get(), &0);
+        assert_eq!(e1.get(), &1);
+        assert_eq!(e2.get(), &2);
+        Ok(())
+    }
+
+    #[test]
+    fn test_vertex_id() -> crate::Result<()> {
+        let vertex_id = VertexId::new(1);
+        assert_eq!(vertex_id.get(), &1);
+        Ok(())
+    }
+
+    #[test]
+    fn test_position() -> crate::Result<()> {
+        let mut index = IndexFrame::<usize>::zero();
+        // create some edge indices
+        let e0 = index.next_edge()?;
+        let e1 = index.next_edge()?;
+        let e2 = index.next_edge()?;
+        // check the edge indices
+        assert_eq!(e0, &0);
+        assert_eq!(e1, &1);
+        assert_eq!(e2, &2);
+        // create some vertex indices
+        let v0 = index.next_node()?;
+        let v1 = index.next_node()?;
+        let v2 = index.next_node()?;
+        // check the vertex indices
+        assert_eq!(e0.get(), v0.get());
+        assert_eq!(e1.get(), v1.get());
+        assert_eq!(e2.get(), v2.get());
+        Ok(())
+    }
+
+    #[test]
+    fn test_tracker() -> crate::Result<()> {
+        let mut history = IndexTracker::<usize>::zero();
+        // create some edge indices
+        let e0 = history.next_edge()?;
+        let e1 = history.next_edge()?;
+        let e2 = history.next_edge()?;
+        // veryify the edge indices
+        assert_eq!(history.edges(), &[e0, e1, e2]);
+        // create some vertex indices
+        let v0 = history.next_vertex()?;
+        let v1 = history.next_vertex()?;
+        let v2 = history.next_vertex()?;
+        // verify the vertex indices
+        assert_eq!(history.nodes(), &[v0, v1, v2]);
+        Ok(())
+    }
 }

@@ -35,6 +35,10 @@ extern crate alloc;
 #[macro_use]
 mod macros {
     #[macro_use]
+    pub(crate) mod index;
+    #[macro_use]
+    pub(crate) mod hypergraph;
+    #[macro_use]
     pub(crate) mod seal;
 }
 // modules
@@ -43,7 +47,6 @@ pub mod edge;
 pub mod error;
 pub mod idx;
 pub mod node;
-pub mod rel;
 pub mod weight;
 
 pub mod traits {
@@ -84,11 +87,10 @@ pub mod types {
 #[doc(inline)]
 pub use self::{
     attrs::{Attrs, GraphProps},
-    edge::Edge,
+    edge::{HyperEdge, Link, RawEdge},
     error::{Error, Result},
     idx::prelude::*,
     node::Node,
-    rel::{Link, RawLayout},
     traits::*,
     types::*,
     weight::{IntoWeight, Weight, Weightless},
@@ -96,13 +98,13 @@ pub use self::{
 // prelude
 #[doc(hidden)]
 pub mod prelude {
-    // pub use crate::error::*;
+    #[cfg(feature = "macros")]
+    pub use crate::{hyperedge, hypergraph, hypernode};
 
     pub use crate::attrs::prelude::*;
     pub use crate::edge::prelude::*;
     pub use crate::idx::prelude::*;
     pub use crate::node::prelude::*;
-    pub use crate::rel::prelude::*;
     pub use crate::traits::*;
     pub use crate::types::*;
     pub use crate::weight::*;

@@ -73,6 +73,6 @@ impl IndexError {
     }
     /// initialize a new [`VertexDoesNotExist`](IndexError::VertexDoesNotExist) error variant
     pub fn vertex_does_not_exist<Idx: RawIndex>(index: VertexId<Idx>) -> Self {
-        IndexError::NodeDoesNotExist(index.into_raw_box())
+        IndexError::NodeDoesNotExist(index.into_boxed_value())
     }
 }

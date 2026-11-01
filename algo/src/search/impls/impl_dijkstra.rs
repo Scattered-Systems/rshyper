@@ -14,9 +14,9 @@ use core::hash::{BuildHasher, Hash};
 use hashbrown::HashSet;
 use num_traits::bounds::UpperBounded;
 use num_traits::{FromPrimitive, Num};
-use rshyper::idx::{HyperIndex, RawIndex, VertexId, VertexSet};
-use rshyper::rel::RawLayout;
-use rshyper::{GraphProps, HyperGraph, HyperGraphIter};
+use rshyper_core::edge::RawEdge;
+use rshyper_core::idx::{HyperIndex, RawIndex, VertexId, VertexSet};
+use rshyper_core::{GraphProps, HyperGraph, HyperGraphIter};
 
 impl<'a, N, E, A, H, S> Dijkstra<'a, N, E, A, H, S>
 where
@@ -151,7 +151,7 @@ where
     H: HyperGraph<N, E, A>,
     S: BuildHasher,
     A::Ix: HyperIndex,
-    <H::Edge<E> as RawLayout>::Store: Clone + IntoIterator<Item = VertexId<A::Ix>>,
+    <H::Edge<E> as RawEdge>::Store: Clone + IntoIterator<Item = VertexId<A::Ix>>,
 {
     type Path = Vec<VertexId<A::Ix>>;
 
@@ -254,7 +254,7 @@ where
     A: GraphProps,
     H: HyperGraphIter<N, E, A>,
     A::Ix: HyperIndex,
-    <H::Edge<E> as RawLayout>::Store: Clone + IntoIterator<Item = VertexId<A::Ix>>,
+    <H::Edge<E> as RawEdge>::Store: Clone + IntoIterator<Item = VertexId<A::Ix>>,
 {
     type Output = Vec<VertexId<A::Ix>>;
 

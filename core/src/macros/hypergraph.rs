@@ -2,6 +2,8 @@
     appellation: hypergraph <module>
     authors: @FL03
 */
+#![cfg(feature = "macros")]
+
 /// the [`hypergraph`] macro works to aide the in the creation of hypergraphs by allowing
 /// users to define nodes and edges in a hypergraph in a more declarative way.
 ///
@@ -51,7 +53,6 @@
 ///         };
 ///     }
 /// }
-#[cfg(feature = "macros")]
 #[macro_export]
 macro_rules! hypergraph {
     (
@@ -127,7 +128,6 @@ macro_rules! hypergraph {
 ///     Ok(())
 /// }
 /// ```
-#[cfg(feature = "macros")]
 #[macro_export]
 macro_rules! hyperedge {
     ($src:ident { $(let $edge:ident: [$($var:ident),*] $(= $w:expr)?);* $(;)? }) => {
@@ -180,7 +180,6 @@ macro_rules! hyperedge {
 ///     }
 ///  }
 /// ```
-#[cfg(feature = "macros")]
 #[macro_export]
 macro_rules! hypernode {
     ($src:ident { $(let $var:ident $(= $w:expr)?);* $(;)? }) => {

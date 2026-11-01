@@ -2,10 +2,18 @@
     appellation: index <module>
     authors: @FL03
 */
+
 /// a simple trait for denoting types compatible with to be used as indices in a hypergraph.
 /// **note:** the trait is sealed to prevent external implementations.
 pub trait RawIndex: 'static + Send + Sync + core::fmt::Debug + core::fmt::Display {
-    private!();
+    private! {}
+}
+
+pub trait Idx: RawIndex
+where
+    Self: Clone + Copy + Eq + PartialOrd + core::hash::Hash,
+{
+    type Kind: ?Sized;
 
     /// converts the index to a string representation.
     #[cfg(feature = "alloc")]
@@ -129,25 +137,15 @@ where
     seal!();
 }
 
-#[cfg(feature = "alloc")]
-impl RawIndex for alloc::boxed::Box<dyn RawIndex> {
-    seal!();
-}
-
-#[cfg(feature = "alloc")]
-impl<'a> RawIndex for alloc::boxed::Box<dyn RawIndex + Send + Sync + 'a> {
-    seal!();
-}
-
 macro_rules! impl_raw_index {
-    ($($t:ty),* $(,)?) => {
+    ($($T:ty),* $(,)?) => {
         $(
-            impl_raw_index!(@impl $t);
+            impl_raw_index!(@impl RawIndex for $T);
         )*
     };
-    (@impl $t:ty) => {
-        impl RawIndex for $t {
-            seal!();
+    (@impl $trait:ident for $t:ty) => {
+        impl $crate::idx::$trait for $t {
+            seal! {}
         }
     };
 }
@@ -159,6 +157,19 @@ impl_raw_index! {
 }
 
 #[cfg(feature = "alloc")]
-impl_raw_index! {
-    alloc::string::String,
+mod impl_alloc {
+    use super::RawIndex;
+    use alloc::boxed::Box;
+
+    impl_raw_index! {
+        alloc::string::String,
+    }
+
+    impl RawIndex for Box<dyn RawIndex> {
+        seal! {}
+    }
+
+    impl RawIndex for Box<dyn RawIndex + Send + Sync + 'static> {
+        seal! {}
+    }
 }

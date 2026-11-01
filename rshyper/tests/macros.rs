@@ -2,11 +2,9 @@
     appellation: macros <module>
     authors: @FL03
 */
-#[cfg(feature = "hyper_map")]
 use rshyper::HyperMap;
 
 #[test]
-#[cfg(feature = "hyper_map")]
 fn test_hypergraph_on_eg() -> rshyper::Result<()> {
     // initialize a new, undirected hypergraph
     let mut graph = HyperMap::<usize, usize>::undirected();
@@ -39,7 +37,6 @@ fn test_hypergraph_on_eg() -> rshyper::Result<()> {
 }
 
 #[test]
-#[cfg(feature = "hyper_map")]
 fn test_hypernode_on_eg() -> rshyper::Result<()> {
     // initialize a new, undirected hypergraph
     let mut graph = HyperMap::<usize, usize>::undirected();
@@ -64,7 +61,6 @@ fn test_hypernode_on_eg() -> rshyper::Result<()> {
 }
 
 #[test]
-#[cfg(feature = "hyper_map")]
 fn test_hyperedge_on_hg() -> rshyper::Result<()> {
     // initialize a new, undirected hypergraph
     let mut graph = HyperMap::<usize, usize>::undirected();

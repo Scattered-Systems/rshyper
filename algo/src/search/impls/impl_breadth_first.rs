@@ -9,8 +9,8 @@ use crate::error::{Error, Result};
 use crate::search::Search;
 use alloc::collections::VecDeque;
 use core::hash::{BuildHasher, Hash};
-use rshyper::idx::{HyperIndex, VertexId, VertexSet};
-use rshyper::{GraphProps, HyperGraph, RawLayout};
+use rshyper_core::idx::{HyperIndex, VertexId, VertexSet};
+use rshyper_core::{GraphProps, HyperGraph, RawEdge};
 
 impl<'a, N, E, A, H, S> BreadthFirstTraversal<'a, N, E, A, H, S>
 where
@@ -65,7 +65,7 @@ where
     pub fn search(&mut self, start: VertexId<A::Ix>) -> Result<Vec<VertexId<A::Ix>>>
     where
         A::Ix: HyperIndex,
-        for<'b> &'b <H::Edge<E> as RawLayout>::Store: IntoIterator<Item = &'b VertexId<A::Ix>>,
+        for<'b> &'b <H::Edge<E> as RawEdge>::Store: IntoIterator<Item = &'b VertexId<A::Ix>>,
     {
         Search::search(self, start)
     }
@@ -88,7 +88,7 @@ where
     H: HyperGraph<N, E, A>,
     S: BuildHasher,
     A::Ix: HyperIndex,
-    for<'b> &'b <H::Edge<E> as RawLayout>::Store: IntoIterator<Item = &'b VertexId<A::Ix>>,
+    for<'b> &'b <H::Edge<E> as RawEdge>::Store: IntoIterator<Item = &'b VertexId<A::Ix>>,
 {
     type Output = Vec<VertexId<A::Ix>>;
 

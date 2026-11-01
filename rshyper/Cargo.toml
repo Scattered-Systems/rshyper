@@ -16,7 +16,7 @@ version.workspace = true
 
 [package.metadata.docs.rs]
 all-features = false
-features = ["full"]
+features = ["default"]
 rustc-args = ["--cfg", "docsrs"]
 version = "v{{version}}"
 
@@ -29,6 +29,7 @@ bench = false
 crate-type = ["lib"]
 doc = true
 doctest = true
+path = "lib.rs"
 test = true
 
 [[example]]
@@ -74,10 +75,13 @@ hash_graph = ["hyper_map"]
 
 hyper_map = [
   "dep:rshyper-hmap",
+  "hashbrown",
   "std",
 ]
 
-macros = []
+macros = [
+  "rshyper-core/macros",
+]
 
 # ************* [FF:Environments] *************
 nightly = [
@@ -113,6 +117,10 @@ alloc = [
   "rshyper-algo?/alloc",
   "rshyper-core/alloc",
   "rshyper-hmap?/alloc",
+]
+
+hashbrown = [
+  "rshyper-core/hashbrown",
 ]
 
 json = [

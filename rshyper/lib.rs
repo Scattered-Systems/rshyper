@@ -1,3 +1,9 @@
+#![crate_name = "rshyper"]
+#![crate_type = "lib"]
+#![doc(
+    html_logo_url = "https://raw.githubusercontent.com/FL03/rshyper/main/.artifacts/assets/logo.svg",
+    html_favicon_url = "https://raw.githubusercontent.com/FL03/rshyper/main/.artifacts/assets/logo.svg"
+)]
 //! # rshyper
 //!
 //! [![crates.io](https://img.shields.io/crates/v/rshyper?style=for-the-badge&logo=rust)](https://crates.io/crates/rshyper)
@@ -75,12 +81,6 @@
 //! let e3 = graph.add_edge([v0, v2], Weight(5)).expect("failed to add surface");
 //! ```
 //!
-#![crate_name = "rshyper"]
-#![crate_type = "lib"]
-#![doc(
-    html_logo_url = "https://raw.githubusercontent.com/FL03/rshyper/main/.artifacts/assets/logo.svg",
-    html_favicon_url = "https://raw.githubusercontent.com/FL03/rshyper/main/.artifacts/assets/logo.svg"
-)]
 #![allow(
     clippy::missing_errors_doc,
     clippy::missing_panics_doc,
@@ -99,13 +99,6 @@ compile_error! { "either the `alloc` or `std` feature must be enabled for the rs
 // external crates
 #[cfg(feature = "alloc")]
 extern crate alloc;
-// macros
-#[macro_use]
-#[cfg(feature = "macros")]
-pub(crate) mod macros {
-    #[macro_use]
-    pub mod hypergraph;
-}
 // external modules
 #[doc(inline)]
 #[cfg(feature = "algo")]
@@ -113,8 +106,7 @@ pub(crate) mod macros {
 pub use rshyper_algo as algo;
 #[doc(inline)]
 #[cfg(feature = "hyper_map")]
-/// this module contains the [`HyperMap`](rshyper_hmap::HyperMap), a hash-based hypergraph
-/// implementation
+/// a map-based implementation of the hypergraph
 pub use rshyper_hmap as hyper_map;
 // re-exports
 #[doc(inline)]
@@ -124,12 +116,9 @@ pub use self::hyper_map::{DiHyperMap, HyperMap, UnHyperMap};
 pub use rshyper_core::*;
 // prelude
 #[doc(hidden)]
-#[allow(missing_docs)]
 pub mod prelude {
     pub use rshyper_core::prelude::*;
 
-    #[cfg(feature = "macros")]
-    pub use crate::{hyperedge, hypergraph, hypernode};
     #[cfg(feature = "algo")]
     pub use rshyper_algo::prelude::*;
     #[cfg(feature = "hyper_map")]

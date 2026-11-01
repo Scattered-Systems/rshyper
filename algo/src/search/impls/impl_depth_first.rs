@@ -10,7 +10,7 @@ use crate::{Search, Traversal};
 use core::hash::{BuildHasher, Hash};
 use hashbrown::HashSet;
 use rshyper_core::idx::{HashIndex, HyperIndex, VertexId, VertexSet};
-use rshyper_core::{GraphProps, HyperGraph, RawLayout};
+use rshyper_core::{GraphProps, HyperGraph, RawEdge};
 
 impl<'a, N, E, H, A, S> DepthFirstTraversal<'a, N, E, A, H, S>
 where
@@ -111,7 +111,7 @@ where
     H: HyperGraph<N, E, A>,
     S: BuildHasher,
     A::Ix: HyperIndex,
-    for<'b> &'b <H::Edge<E> as RawLayout>::Store: IntoIterator<Item = &'b VertexId<A::Ix>>,
+    for<'b> &'b <H::Edge<E> as RawEdge>::Store: IntoIterator<Item = &'b VertexId<A::Ix>>,
 {
     type Output = Vec<VertexId<A::Ix>>;
 
